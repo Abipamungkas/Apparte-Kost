@@ -1,0 +1,95 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Admin {
+  adminId  Int    @id @default(autoincrement())
+  email    String @unique
+  name     String
+  password String
+}
+
+model User {
+  userId    Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String
+  phone     String
+  password  String     @db.Text
+  picture   String?
+  reviews   Review[]
+  bookings  Booking[]
+  bookmarks Bookmark[]
+}
+
+model BoardingHouse {
+  boardingHouseId Int        @id @default(autoincrement())
+  name            String
+  owner           String
+  ownerPicture    String?
+  email           String     @unique
+  phone           String
+  password        String?    @db.Text
+  description     String     @db.Text
+  district        String
+  subdistrict     String
+  location        String
+  panoramas       Panorama[]
+  maxCapacity     Int
+  price           Float
+  isPending       Boolean    @default(true)
+  isConfirmed     Boolean    @default(false)
+  isActive        Boolean    @default(false)
+  pictures        Picture[]
+  reviews         Review[]
+  bookings        Booking[]
+  bookmarks       Bookmark[]
+}
+
+model Panorama {
+  panoramaId      Int           @id @default(autoincrement())
+  panorama        String
+  boardingHouse   BoardingHouse @relation(fields: [boardingHouseId], references: [boardingHouseId])
+  boardingHouseId Int
+}
+
+model Picture {
+  pictureId       Int           @id @default(autoincrement())
+  picture         String
+  boardingHouse   BoardingHouse @relation(fields: [boardingHouseId], references: [boardingHouseId])
+  boardingHouseId Int
+}
+
+model Review {
+  reviewId        Int           @id @default(autoincrement())
+  user            User          @relation(fields: [userId], references: [userId])
+  userId          Int
+  boardingHouse   BoardingHouse @relation(fields: [boardingHouseId], references: [boardingHouseId])
+  boardingHouseId Int
+  rating          Int
+  comment         String?
+  createdAt       DateTime      @default(now())
+}
+
+model Booking {
+  bookingId       Int           @id @default(autoincrement())
+  user            User          @relation(fields: [userId], references: [userId])
+  userId          Int
+  boardingHouse   BoardingHouse @relation(fields: [boardingHouseId], references: [boardingHouseId])
+  boardingHouseId Int
+  bookedDate      DateTime
+  isActive        Boolean       @default(true)
+}
+
+model Bookmark {
+  bookmarkId      Int           @id @default(autoincrement())
+  user            User          @relation(fields: [userId], references: [userId])
+  userId          Int
+  boardingHouse   BoardingHouse @relation(fields: [boardingHouseId], references: [boardingHouseId])
+  boardingHouseId Int
+  bookmarkDate    DateTime      @default(now())
+}
